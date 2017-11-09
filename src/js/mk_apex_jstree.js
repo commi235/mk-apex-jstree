@@ -1,3 +1,5 @@
+//@ts-check
+/// <reference types="orclapex-js" />
 (
   function( util, item, $)
   {

@@ -1,0 +1,18 @@
+{
+  "name": "mk-apex-jstree",
+  "version": "0.0.1",
+  "description": "Oracle APEX Item Plugin using jsTree",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "APEX",
+    "jstree"
+  ],
+  "author": "Moritz Klein",
+  "license": "MIT",
+  "devDependencies": {
+    "orclapex-js": "git+https://github.com/commi235/orclapex-js.git"
+  }
+}
