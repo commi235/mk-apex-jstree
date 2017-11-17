@@ -155,13 +155,11 @@ begin
   , p_is_readonly    => p_param.is_readonly
   , p_is_printer_friendly => p_param.is_printer_friendly
   );
-  l_name := apex_plugin.get_input_name_for_page_item(p_is_multi_value => true);
 
-  apex_css.add_file
-  (
-    p_name => 'mk_apex_jstree'
-  , p_directory => p_plugin.file_prefix || 'css/'
-  );
+
+  if p_param.value_set_by_controller and p_param.is_readonly then
+    return;
+  end if;
 
   apex_css.add_file
   (
@@ -169,6 +167,15 @@ begin
   , p_directory => get_theme_css_dir( pi_theme => l_theme )
   );
 
+  if p_param.is_readonly or p_param.is_printer_friendly then
+    apex_plugin_util.print_hidden_if_readonly
+    (
+      p_item  => p_item
+    , p_param => p_param
+    );
+  end if;
+
+    /* not needed
   l_disp_values :=
     apex_plugin_util.get_display_data
     (
@@ -180,7 +187,9 @@ begin
       p_search_column_no  => 1,
       p_search_value_list => apex_util.string_to_table(p_param.value)
     );
-  
+    */
+  l_name := apex_plugin.get_input_name_for_item;
+
   sys.htp.prn('<div class="mk-apex-jstree-wrap">');
   if p_param.is_readonly or p_param.is_printer_friendly then
     apex_plugin_util.print_hidden_if_readonly
@@ -199,10 +208,8 @@ begin
         p_item => p_item
       , p_name => l_name
       , p_default_class => 'apex-item-plugin mk-apex-jsTree-val'
-      , p_add_id => false
       ) ||
-      'id="' || p_item.name || '" ' ||
-      'value="' || p_param.value || '" />'
+      'value="' || apex_escape.html_attribute(p_param.value) || '" />'
     );
   end if;
   sys.htp.prn
@@ -212,15 +219,12 @@ begin
     'id="'    || p_item.name || '_DISPLAY" ></div>'
   );
   sys.htp.prn('</div>');
-  apex_javascript.add_library
-  (
-    p_name      => 'mk_apex_jstree2'
-  , p_directory => p_plugin.file_prefix || 'js/'
-  );
 
   apex_javascript.add_onload_code
   (
-    p_code => 'mkApexJsTree("#' || p_item.name || '", {'
+    p_code => 'mkApexJsTree('
+                 || apex_javascript.add_value( p_value => '#' || p_item.name)
+                 || ' {'
                  || apex_javascript.add_attribute( p_name => 'useAjax'
                                                  , p_value => c_enable_ajax
                                                  , p_omit_null => false
@@ -236,7 +240,8 @@ begin
                                                  , p_add_comma => false)
                  || '});'
   );
-  p_result.is_navigable := (not p_param.is_readonly = false and not p_param.is_printer_friendly);
+  p_result.is_navigable := not ( p_param.is_readonly or p_param.is_printer_friendly );
+
 end render_jstree;
 
 procedure ajax_jstree

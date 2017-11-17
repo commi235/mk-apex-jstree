@@ -21,35 +21,42 @@ window.mkApexJsTree = function( pSelector, pOptions ) {
         };
     item.create( this.id, lItemImpl);
 
-    if ( gOptions.readOnly ) {
-      jsTreeItem.prop("disabled", true)
-                .addClass("apex_disabled");
+    function render() {
+      if ( gOptions.readOnly ) {
+        jsTreeItem.prop("disabled", true)
+                  .addClass("apex_disabled");
+      }
+
+      if ( gOptions.useAjax === true ) {
+        jsTree = jsTreeItem.jstree({ "core" : { "data" : { "url" : apex.server.pluginUrl(gOptions.ajaxIdent, { x01: this.val() }) } }, "plugins" : [ "checkbox" ]});
+      }
+      else {
+        jsTree = jsTreeItem.jstree( { "core" : { "data" : gOptions.data }, "plugins" : [ "checkbox" ]} );
+      }
+      if ( !gOptions.readOnly ) {
+        jsTree.on("changed.jstree", function( e, data ) {
+          var setableElements = $.grep( data.selected, function(obj) {
+            return jsTree.jstree(true).get_node(obj).data.setValue === true;
+          });
+          gItem$.val(setableElements.join(":")).change();
+        });
+      }
+      return jsTree;
     }
 
-    if ( gOptions.useAjax === true ) {
-      jsTree = jsTreeItem.jstree({ "core" : { "data" : { "url" : apex.server.pluginUrl(gOptions.ajaxIdent, { x01: this.val() }) } }, "plugins" : [ "checkbox" ]});
-    }
-    else {
-      jsTree = jsTreeItem.jstree( { "core" : { "data" : gOptions.data }, "plugins" : [ "checkbox" ]} );
-    }
-    jsTree.on("changed.jstree", function( e, data ) {
-      var setableElements = $.grep( data.selected, function(obj) {
-        return jsTree.jstree(true).get_node(obj).data.setValue === true;
-      });
-      gItem$.val(setableElements.join(":")).change();
-    });
+    render();
   });
 
   function _setValue( pValue ) {
+    var tree = $( pSelector + '_DISPLAY').jstree();
     gItem$.val( pValue );
+    tree.deselect_all( true );
+    tree.select_node( pValue, true );
   }
 
   function _getValue() {
     return $( pSelector ).val();
   }
 
-  function _render() {
-    return;
-  }
 }
 }) (apex.util, apex.item, apex.jQuery)
