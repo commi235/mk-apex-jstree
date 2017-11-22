@@ -15,9 +15,12 @@ window.mkApexJsTree = function( pSelector, pOptions ) {
   gItem$.each( function() {
     var jsTreeItem = $("#" + this.id + "_DISPLAY"),
         jsTree,
-        lItemImpl = {
-          setValue: _setValue,
-          getValue: _getValue
+        lItemImpl =
+        {
+          setValue:        _setValue
+        , getValue:        _getValue
+        // not yet used
+        //, displayValueFor: _displayValueFor
         };
     item.create( this.id, lItemImpl);
 
@@ -34,11 +37,14 @@ window.mkApexJsTree = function( pSelector, pOptions ) {
         jsTree = jsTreeItem.jstree( { "core" : { "data" : gOptions.data }, "plugins" : [ "checkbox" ]} );
       }
       if ( !gOptions.readOnly ) {
-        jsTree.on("changed.jstree", function( e, data ) {
-          var setableElements = $.grep( data.selected, function(obj) {
-            return jsTree.jstree(true).get_node(obj).data.setValue === true;
+        jsTree.on("ready.jstree", function() {
+          jsTree.on("changed.jstree", function( e, data ) {
+            var setableElements = $.grep( data.selected, function(obj) {
+              return jsTree.jstree(true).get_node(obj).data.setValue === true;
+            });
+            console.log('change handler fired');
+            gItem$.val(setableElements.join(":")).change();
           });
-          gItem$.val(setableElements.join(":")).change();
         });
       }
       return jsTree;
@@ -56,6 +62,21 @@ window.mkApexJsTree = function( pSelector, pOptions ) {
 
   function _getValue() {
     return $( pSelector ).val();
+  }
+
+  function _displayValueFor( pValue ) {
+    var tree = $( pSelector + '_DISPLAY').jstree();
+    var out = util.htmlBuilder();
+    if ( pValue ) {
+      out.markup("<ul>");
+      $( pValue ).each( function(){
+        out.markup("<li>")
+           .markup(tree.get_node(this).data.text)
+           .markup("</li>");
+      });
+      out.markup("<ul>");
+    }
+    return out.toString;
   }
 
 }
