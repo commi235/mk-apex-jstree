@@ -1,0 +1,34 @@
+{
+  "name" : "JS-Tree Item",
+  "version" : "0.0.1",
+  "description" : "JSTree Item Plugin for Oracle Application Express",
+  "keywords" : ["jstree", "item", "iGrid"],
+  "homepage" : "https://github.com/commi235/mk-apex-jstree",
+  "bugs" : {
+    "url" : "https://github.com/commi235/mk-apex-jstree/issues",
+    "email" : "moritz.klein@it-twins.de"
+  },
+  "license" : "MIT",
+  "author" : {
+    "name" : "Moritz Klein",
+    "email" : "moritz.klein@it-twins.de",
+    "url" : "https://github.com/commi235",
+    "twitter" : "commi235"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/commi235/mk-apex-jstree.git"
+  },
+  "oracle" : {
+    "versions" : ["11.2.0.1", "12.1.0.1", "12.2.0.1"],
+    "apex" : {
+      "versions" : ["5.1.0"],
+      "plugin" : {
+        "internalName" : "DE.IT-TWINS.MK-IG-JSTREE",
+        "type" : "item",
+        "demo" : "",
+        "previewImage" : "https://raw.githubusercontent.com/commi235/mk-apex-jstree/master/preview.png"
+      }
+    }
+  }
+}
